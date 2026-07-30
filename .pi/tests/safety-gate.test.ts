@@ -8,7 +8,7 @@ import {
 	classifyCommand,
 	commandBlockReason,
 	isProtectedPath,
-} from "./safety-gate.ts";
+} from "../extensions/safety-gate.ts";
 
 test("protects credentials and generated API types", () => {
 	const cwd = mkdtempSync(join(tmpdir(), "cloudpilot-safety-"));
