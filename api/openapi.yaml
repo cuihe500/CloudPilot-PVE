@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: CloudPilot-PVE API
+  version: 0.1.0
+  description: API contract for the CloudPilot-PVE service.
+servers:
+  - url: /api
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      summary: Check service liveness
+      security: []
+      responses:
+        "200":
+          description: The service can handle HTTP requests.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+  /readyz:
+    get:
+      operationId: getReadiness
+      summary: Check service readiness
+      security: []
+      responses:
+        "200":
+          description: All dependencies required by this service are ready.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+components:
+  schemas:
+    StatusResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          const: ok

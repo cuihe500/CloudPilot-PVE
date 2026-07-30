@@ -1,0 +1,35 @@
+{
+  "name": "cloudpilot-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.18.0",
+  "scripts": {
+    "dev": "vite",
+    "generate:api": "openapi-typescript ../api/openapi.yaml -o src/api/schema.d.ts",
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "build": "vue-tsc --noEmit && vite build"
+  },
+  "dependencies": {
+    "ant-design-vue": "^4.2.6",
+    "openapi-fetch": "^0.17.0",
+    "vue": "^3.5.40"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.1.2",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.8.0",
+    "eslint-plugin-vue": "^10.10.0",
+    "jsdom": "^30.0.1",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.65.0",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^3.3.8"
+  }
+}

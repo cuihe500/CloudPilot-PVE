@@ -33,8 +33,8 @@ AI 原生的 Proxmox VE 运维平台。通过自然语言完成虚拟机与 LXC 
 
 ## 技术方案
 
-- 前端：Vue 3、TypeScript、Vite、Element Plus
-- 后端：Go、`net/http`、PostgreSQL、`pgx`、`sqlc`
+- 前端：Vue 3、TypeScript、Vite、Ant Design Vue，使用 pnpm 管理依赖
+- 后端：Go、Gin、PostgreSQL、`pgx`、`sqlc`
 - 后台任务：River，复用 PostgreSQL 承载持久化任务
 - 接口契约：OpenAPI 3.1，生成 Go 与 TypeScript 类型
 - AI：单模型 Structured Outputs，确定性代码完成校验和执行
@@ -80,4 +80,4 @@ AI 原生的 Proxmox VE 运维平台。通过自然语言完成虚拟机与 LXC 
 
 ## 当前状态
 
-项目初始化中。仅仓库骨架，尚无可运行代码。
+基础运行框架已建立：Gin 提供健康与就绪 API，Vue 页面通过 OpenAPI 生成类型展示后端状态。数据库、认证、任务队列、LLM、PVE 和业务黄金路径尚未实现。
