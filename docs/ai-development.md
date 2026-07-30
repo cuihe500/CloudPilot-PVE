@@ -77,24 +77,42 @@ Ponytail 只控制复杂度，不替代正确性、安全和测试审查。
 - `/review`：只读审查当前变更，按严重程度报告问题。
 - `/verify`：执行适用检查并记录证据。
 
-OpenSpec 已承担需求澄清和计划职责，因此不安装完整 Superpowers bootstrap、强制 worktree 或子 Agent 编排。
+Issue、Project 和 OpenSpec 已分别承担需求入口、排期和规格职责，因此不安装完整 Superpowers bootstrap、强制 worktree 或子 Agent 编排。
 
 ## 4. 标准变更流程
 
-### 4.1 接收任务
+项目跟踪入口固定为 [`CloudPilot-PVE Development`](https://github.com/users/cuihe500/projects/5)。状态流转为：
 
-AI 必须先：
+```text
+Backlog → Planned → Spec → In Progress → Testing → In Review → Done
+```
 
-1. 阅读 `AGENTS.md`。
-2. 阅读相关 OpenSpec 和 `docs/architecture.md`。
-3. 检查现有实现、调用者、测试和相邻模式。
-4. 确认是否涉及信任边界或数据迁移。
+Project 使用 P0-P3 Priority 和两周 Iteration。每次状态更新都是门禁；更新失败时停止推进并报告。
 
-如果仓库事实与需求冲突，先说明冲突，不自行选择更方便的解释。
+### 4.1 登记需求与排期
 
-### 4.2 形成规格
+需求确认后先创建 Issue，正文至少包含目标、范围和可验证验收标准。网页创建使用需求模板，CLI 创建使用：
 
-以下任一条件成立时先创建或更新 OpenSpec：
+```bash
+gh issue create \
+  --repo cuihe500/CloudPilot-PVE \
+  --project "CloudPilot-PVE Development" \
+  --title "<需求标题>" \
+  --body-file <issue-body>
+```
+
+Issue 加入 Project 时为 `Backlog`。设置 Priority 和 Iteration 后改为 `Planned`；任一字段缺失时不得进入 OpenSpec。Issue 是唯一 Project 事项，后续 PR 不重复加入。
+
+AI 随后必须：
+
+1. 阅读 `AGENTS.md`、Issue、相关 OpenSpec 和 `docs/architecture.md`。
+2. 检查现有实现、调用者、测试和相邻模式。
+3. 确认是否涉及信任边界或数据迁移。
+4. 发现仓库事实与需求冲突时先说明，不自行选择更方便的解释。
+
+### 4.2 形成和批准规格
+
+开始编写 OpenSpec 前将 Project 状态改为 `Spec`，且提案必须引用 Issue。以下任一条件成立时创建或更新 OpenSpec：
 
 - 新增用户可见行为。
 - 修改 API、数据库或状态转换。
@@ -102,59 +120,11 @@ AI 必须先：
 - 需要修改多个组件。
 - 验收方式不明确。
 
-规格至少覆盖：
+规格至少覆盖目标、范围、非目标、正常/失败流程、权限与审批要求及可自动化验收场景。OpenSpec 未获批准不得实现；批准并开始开发时将状态改为 `In Progress`。
 
-- 用户和业务目标。
-- 范围与明确非目标。
-- 正常流程和失败流程。
-- 权限与审批要求。
-- 可自动化验证的验收场景。
-
-### 4.3 实现
-
-AI 应选择能满足已批准规格的最小实现：
-
-- 先复用仓库现有实现。
-- 再使用标准库和平台能力。
-- 再使用已经批准的依赖。
-- 最后才增加新代码或依赖。
-
-禁止顺手重构、提前建立多模型/多集群抽象、复制前后端 DTO 或为单实现创建接口。
-
-### 4.4 验证
-
-验证分为两层：
-
-1. **针对性验证**：最小测试证明本次逻辑和回归场景。
-2. **仓库验证**：统一执行 `make check`。
-
-不允许使用以下表达代替验证：
-
-- “应该可以”。
-- “看起来没问题”。
-- “类型上不会出错”。
-- “之前测试通过”。
-
-没有可运行代码或检查命令尚未建立时，必须明确报告“未验证”及原因。
-
-### 4.5 审查与交付
-
-完成前运行 `/review`，重点检查：
-
-- 是否满足 OpenSpec，而不是只看测试是否通过。
-- 是否存在越权、绕过审批或配额竞态。
-- 是否泄露秘密或个人数据。
-- 是否破坏幂等、事务、重试和回收安全。
-- 是否新增无必要依赖和抽象。
-- OpenAPI、迁移、生成文件和文档是否同步。
-
-AI 修复审查问题后必须重新运行受影响检查。最终报告只包含实际证据和剩余风险。
-
-### 4.6 分支、提交与 PR
+### 4.3 建立分支并实现
 
 `main` 只接收通过 PR 合并的变更。文档、小修复和自动生成变更也不能直接提交到 `main`。
-
-开始任务：
 
 ```bash
 git status --short
@@ -163,27 +133,32 @@ git pull --ff-only origin main
 git switch -c <type>/<short-topic>
 ```
 
-要求：
-
-- 开始前工作树必须干净；发现不属于当前任务的改动时停止并说明。
-- 分支必须从最新 `origin/main` 创建。
-- 一个分支对应一个 OpenSpec 变更或一个内聚任务，不混入顺手修改。
+- 工作树必须干净，分支必须来自最新 `origin/main`。
+- 一个分支对应一个 Issue/OpenSpec 或一个内聚小任务。
 - 分支类型使用 `feat`、`fix`、`docs`、`chore`、`refactor`、`test`。
+- AI 使用独立机器账号；项目 Owner `@cuihe500` 不作为 PR 作者。
 - 禁止直接推送 `main`、强制推送或改写已公开提交历史。
+- 实现优先复用现有代码、标准库、平台能力和已批准依赖；禁止顺手重构和投机抽象。
 
-提交前：
+### 4.4 测试与只读审查
 
-1. 运行针对性测试、`/verify` 和适用的 `make check`。
-2. 运行 `/review` 并处理有效发现。
-3. 检查 `git diff`、`git diff --cached` 和 `git status`。
-4. 确认提交中没有秘密、临时文件和无关改动。
+实现完成后先将 Project 状态改为 `Testing`，再执行：
 
-提交信息采用 Conventional Commits，例如：
+1. 针对性测试。
+2. `/verify` 和适用的 `make check`。
+3. `/review`，并处理有效发现。
+4. 检查 diff、暂存区、工作树、秘密和无关文件。
 
-```text
-feat(requests): add change plan preview
-fix(approval): invalidate approval after plan update
-docs: define AI development workflow
+审查必须确认满足 OpenSpec，并检查越权、审批/配额绕过、秘密泄露、幂等/事务/重试/回收安全、无必要依赖，以及 OpenAPI、迁移、生成文件和文档同步。修正后重新运行受影响检查。没有可运行命令时必须明确记录未验证项和原因。
+
+### 4.5 提交 PR 与评审
+
+提交信息使用 Conventional Commits。有对应需求的 PR 必须关联 Issue 和 OpenSpec；不改变行为的小修正填写 `N/A` 和原因：
+
+```markdown
+Closes #123
+
+OpenSpec: `openspec/changes/<change-id>/`
 ```
 
 推送并创建 PR：
@@ -193,23 +168,16 @@ git push -u origin HEAD
 gh pr create --base main --head "$(git branch --show-current)"
 ```
 
-PR 标题应说明结果，正文必须包含：
+PR 正文必须包含背景、实际修改、验证证据、安全与风险、契约/迁移、界面证据和未完成项。有对应 Issue 时，创建成功后立即把其 Project 状态改为 `In Review`。
 
-- **背景与目标**：为什么需要此次变更，关联哪个 OpenSpec/Issue。
-- **修改内容**：按组件列出实际修改，不能只复制提交标题。
-- **验证**：列出实际运行的命令和结果；未运行项写明原因。
-- **安全与风险**：权限、审批、配额、数据、PVE、回滚和兼容性影响。
-- **契约与迁移**：OpenAPI、数据库迁移、配置、生成代码是否变化。
-- **界面证据**：有 UI 变化时提供截图或录屏；无变化时明确标注。
-- **未完成项**：明确延期内容，不用模糊的“后续优化”。
+- Reviewers 必须包含 `@cuihe500`，并由其完成 Owner 审查。
+- `.github/CODEOWNERS` 为所有路径指定 `@cuihe500`。
+- 评审修正在同一分支追加提交，重新验证并更新 PR 正文。
+- `@cuihe500` 批准、CI 通过且评审对话全部解决前不得合并。
 
-PR 创建后：
+### 4.6 合并与结束需求
 
-- 评审修正在同一分支追加提交。
-- 每次影响行为的修正都重新运行相关检查。
-- 新增重要修改时同步更新 PR 正文，而不是只在评论中说明。
-- CI 和必要人工评审通过后才允许合并。
-- 合并后删除远端分支；后续工作从更新后的 `main` 新建分支。
+PR 合并后，`Closes #<issue>` 自动关闭 Issue，Project 内置工作流将状态更新为 `Done`。必须实际确认 Issue 已关闭且状态为 `Done` 后才能报告需求结束。若自动更新失败，手工修正并记录原因。后续工作从更新后的 `main` 新建分支。
 
 ## 5. 质量门禁
 
@@ -285,7 +253,7 @@ Extension 不承担代码审查，也不在每轮自动运行全部测试。检�
 
 为减少长会话漂移：
 
-- 需求事实写入 OpenSpec，不依赖聊天历史。
+- 需求目标和进度写入 Issue/Project，批准后的行为要求写入 OpenSpec，不依赖聊天历史。
 - 架构事实写入 `docs/architecture.md`。
 - API 事实写入 OpenAPI。
 - 当前工作状态使用 Git diff、测试输出和任务清单表达。
@@ -315,7 +283,7 @@ Extension 不承担代码审查，也不在每轮自动运行全部测试。检�
 | 产品行为 | OpenSpec、相关测试 |
 | HTTP API | `api/openapi.yaml`、生成类型 |
 | 架构边界或技术选型 | `docs/architecture.md` |
-| AI 开发流程和门禁 | `AGENTS.md`、本文或 `.pi/` 资源 |
+| AI 开发流程和门禁 | GitHub Project、Issue/PR 模板、`AGENTS.md`、本文或 `.pi/` 资源 |
 | 数据模型 | OpenSpec、迁移、架构文档中的相关部分 |
 | 部署入口 | 部署配置、架构文档 |
 

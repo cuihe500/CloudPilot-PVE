@@ -1,0 +1,3 @@
+schema: spec-driven
+created: 2026-07-30
+goal: 所有已确认需求都按 Issue、排期、OpenSpec、开发、测试、Review、合并的顺序推进，并同步 Project 状态。
