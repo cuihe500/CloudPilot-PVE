@@ -1,6 +1,12 @@
+## 关联
+
+- Issue：Closes #<!-- issue number；不适用时填写 N/A 和原因 -->
+- OpenSpec：`openspec/changes/<!-- change-id -->/` <!-- 不适用时填写 N/A 和原因 -->
+- Project：[`CloudPilot-PVE Development`](https://github.com/users/cuihe500/projects/5)，有对应 Issue 时状态应为 `In Review`
+
 ## 背景与目标
 
-<!-- 为什么需要此次变更？关联 OpenSpec、Issue 或任务。 -->
+<!-- 为什么需要此次变更？ -->
 
 ## 修改内容
 
@@ -46,6 +52,8 @@
 ## 提交前检查
 
 - [ ] 分支从最新 `main` 创建，PR 目标为 `main`
+- [ ] 有对应 Issue 时，已设置 Priority、Iteration，且 Project 状态为 `In Review`
+- [ ] Reviewers 已包含项目 Owner `@cuihe500`
 - [ ] 已阅读并遵守 `AGENTS.md` 和相关 OpenSpec
 - [ ] 当前变更不包含秘密、临时文件或无关重构
 - [ ] 已执行 `/review` 或等价只读审查
