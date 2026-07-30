@@ -10,7 +10,7 @@ generate:
 
 test:
 	go test $(GO_TAGS) ./...
-	node --experimental-strip-types --test .pi/extensions/safety-gate.test.ts
+	node --experimental-strip-types --test .pi/tests/safety-gate.test.ts
 	pnpm --dir web run test
 
 check: check-generated
