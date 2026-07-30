@@ -19,5 +19,5 @@
 
 - [x] 4.1 验证 OpenSpec、模板语法、文档链接和 Project 字段
 - [x] 4.2 执行 `/review` 或等价只读审查并处理发现
-- [ ] 4.3 提交并推送非 `main` 分支，创建关联 Issue #2 的 PR
-- [ ] 4.4 将 Project 状态同步为 `In Review`
+- [x] 4.3 提交并推送非 `main` 分支，创建关联 Issue #2 的 PR
+- [x] 4.4 将 Project 状态同步为 `In Review`
