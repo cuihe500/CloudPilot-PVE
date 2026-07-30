@@ -2,7 +2,7 @@
 
 `CloudPilot PVE PR Bot` 是本仓库专用的 GitHub App。它只编排 Pull Request，使 AI 创建的 PR 可以由项目 Owner `@cuihe500` 独立审查。
 
-关联需求：Issue #3；OpenSpec：`setup-pr-bot`。
+关联需求：Issue #3；OpenSpec：[`setup-pr-bot`](../openspec/changes/archive/2026-07-30-setup-pr-bot/)。
 
 ## 功能边界
 

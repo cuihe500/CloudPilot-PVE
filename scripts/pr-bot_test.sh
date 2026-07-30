@@ -74,7 +74,7 @@ chmod +x "$PR_BOT_GH"
 cat >"$TMP/body.md" <<'EOF'
 ## 关联
 - Issue：Closes #3
-- OpenSpec：`openspec/changes/setup-pr-bot/`
+- OpenSpec：`openspec/changes/archive/2026-07-30-setup-pr-bot/`
 ## 背景与目标
 Create the dedicated PR bot.
 ## 修改内容
