@@ -17,10 +17,10 @@
 - [x] 3.1 Ensure CODEOWNERS and PR workflow require `@cuihe500` review
 - [x] 3.2 Configure `main` for one CODEOWNER approval, stale approval dismissal, resolved conversations, admin enforcement, linear history, and no force push/deletion
 - [x] 3.3 Create a real Draft PR with the App and verify that `@cuihe500` is requested before it becomes ready
-- [ ] 3.4 Remove the Owner `gh` credential from the AI environment after all App acceptance checks pass
+- [x] 3.4 Remove the Owner `gh` credential from the AI environment after all App acceptance checks pass
 
 ## 4. Verification and Delivery
 
 - [x] 4.1 Validate OpenSpec, shell syntax/tests, Markdown links, secret absence, App permissions, and branch protection
 - [x] 4.2 Run a read-only diff review and resolve all findings
-- [ ] 4.3 Commit and push the implementation branch, create the PR with the App using `Closes #3`, and move the Project item to `In Review`
+- [x] 4.3 Commit and push the implementation branch, create the PR with the App using `Closes #3`, and move the Project item to `In Review`
