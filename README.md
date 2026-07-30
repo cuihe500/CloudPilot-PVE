@@ -76,6 +76,7 @@ AI 原生的 Proxmox VE 运维平台。通过自然语言完成虚拟机与 LXC 
 - [架构说明](docs/architecture.md)：技术栈、组件边界、数据流、安全和部署。
 - [AI 主导开发规范](docs/ai-development.md)：OpenSpec、pi CLI、质量门禁和人工确认点。
 - [AI 开发约束](AGENTS.md)：所有 AI 编码工具必须遵守的仓库级规则。
+- [PR 机器人](docs/pr-bot.md)：专用 GitHub App 的权限边界、安装和使用方式。
 
 ## 当前状态
 

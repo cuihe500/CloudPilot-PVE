@@ -1,0 +1,19 @@
+{
+  "name": "CloudPilot PVE PR Bot",
+  "url": "https://github.com/cuihe500/CloudPilot-PVE",
+  "description": "Creates review-ready pull requests for CloudPilot-PVE without code-write or merge access.",
+  "redirect_url": "https://github.com/cuihe500/CloudPilot-PVE",
+  "hook_attributes": {
+    "url": "https://github.com/cuihe500/CloudPilot-PVE",
+    "active": false
+  },
+  "public": false,
+  "default_permissions": {
+    "metadata": "read",
+    "contents": "read",
+    "pull_requests": "write"
+  },
+  "default_events": [],
+  "request_oauth_on_install": false,
+  "setup_on_update": false
+}
