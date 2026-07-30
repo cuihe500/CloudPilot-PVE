@@ -1,6 +1,6 @@
 # CloudPilot-PVE 架构说明
 
-> 状态：MVP 目标架构。仓库目前处于初始化阶段，本文描述首个可运行版本必须遵守的边界，不代表所有组件已经实现。
+> 状态：MVP 目标架构。仓库已具备 Gin 与 Vue 基础运行框架；本文描述首个完整版本必须遵守的边界，不代表数据库、认证、任务队列、LLM 或 PVE 组件已经实现。
 
 ## 1. 目标
 
@@ -53,10 +53,11 @@ flowchart LR
 | 层级 | MVP 选择 | 说明 |
 |---|---|---|
 | 前端 | Vue 3、TypeScript、Vite | 表单、审批流和运维页面优先 |
-| UI | Element Plus | 复用成熟表单、表格、弹窗和状态组件 |
-| 路由 | Vue Router | 单页应用路由 |
+| UI | Ant Design Vue | 复用成熟表单、表格、弹窗和状态组件 |
+| 包管理 | pnpm | 固定工具版本并提交锁文件 |
+| 路由 | Vue Router | 出现第二个真实页面路由时再引入 |
 | API 客户端 | `openapi-typescript`、`openapi-fetch` | 从契约生成类型，避免重复 DTO |
-| 后端 | Go 最新稳定版、`net/http` | 标准库优先，不引入重型 Web 框架 |
+| 后端 | Go 最新稳定版、Gin | Gin 负责 HTTP 路由，标准库负责服务生命周期 |
 | 日志 | `log/slog` | 结构化日志 |
 | 数据库 | PostgreSQL | 事务数据、审计、任务队列统一存储 |
 | 数据访问 | `pgx/v5`、`sqlc` | 显式 SQL 和类型安全生成代码 |

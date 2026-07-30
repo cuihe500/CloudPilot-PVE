@@ -1,20 +1,20 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  OpenSpec artifacts are bilingual. English is the normative source used for
+  validation, implementation, and acceptance. Chinese is a non-normative
+  translation for readers and must not introduce or change requirements.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Write the complete normative artifact in English first.
+    - Append a complete Chinese translation under "## 中文翻译（非规范性）".
+  design:
+    - Write the complete normative artifact in English first.
+    - Append a complete Chinese translation under "## 中文翻译（非规范性）".
+  specs:
+    - Write all OpenSpec operation, requirement, scenario, SHALL/MUST, WHEN, and THEN syntax only in the normative English section.
+    - Append a complete Chinese translation under "## 中文翻译（非规范性）" using plain translated labels that cannot be parsed as requirements or scenarios.
+  tasks:
+    - Write all implementation checkboxes only in the normative English section.
+    - Append a complete Chinese translation under "## 中文翻译（非规范性）" without checkbox syntax.
