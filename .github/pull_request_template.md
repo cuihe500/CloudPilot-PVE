@@ -46,6 +46,7 @@
 ## 提交前检查
 
 - [ ] 分支从最新 `main` 创建，PR 目标为 `main`
+- [ ] Reviewers 已包含项目 Owner `@cuihe500`
 - [ ] 已阅读并遵守 `AGENTS.md` 和相关 OpenSpec
 - [ ] 当前变更不包含秘密、临时文件或无关重构
 - [ ] 已执行 `/review` 或等价只读审查
