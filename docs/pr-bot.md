@@ -2,7 +2,8 @@
 
 `CloudPilot PVE PR Bot` 是本仓库专用的 GitHub App。它只编排 Pull Request，使 AI 创建的 PR 可以由项目 Owner `@cuihe500` 独立审查。
 
-关联需求：Issue #3；OpenSpec：[`setup-pr-bot`](../openspec/changes/archive/2026-07-30-setup-pr-bot/)。
+初始实现：Issue #3；OpenSpec：[`setup-pr-bot`](../openspec/changes/archive/2026-07-30-setup-pr-bot/)。
+当前提交流程与凭据策略：Issue #14；OpenSpec change：`clarify-pr-bot-auth-coexistence`。
 
 ## 功能边界
 
@@ -101,57 +102,96 @@ Only select repositories
 
 `finalize` 只接受 Owner 为 `cuihe500`、安装模式为 `selected`、且安装仓库恰好为 `cuihe500/CloudPilot-PVE` 的安装。
 
-## 创建 PR
+## 使用机器人提交 PR
 
-源分支必须已经推送。PR 正文必须包含以下非空章节：
+### 身份边界与前置条件
 
-```text
-## 关联（必须包含 Issue 和 OpenSpec）
-## 背景与目标
-## 修改内容
-## 验证
-## 安全与风险
-## 契约、数据与配置
-## 界面证据
-## 未完成项
+- 机器人是 AI 创建或维护 PR 时的唯一 PR 身份；它不会创建、修改或推送代码。源分支必须先由正常 Git 流程推送到远端，且相对 `main` 有提交。
+- Owner 的 `gh` 登录可以保留并与机器人共存。机器人每次 GitHub API 调用都会生成新的短期 Installation Token，并仅通过对应 `gh` 子进程的 `GH_TOKEN` 使用它；Token 不写入 `gh auth`。
+- AI 不得使用环境中的 Owner 登录执行 `gh pr create`、直接 `gh api` PR 修改，或其他等效的 PR 创建、更新、请求审查命令。必须调用本脚本。
+- 在开始前，完成对应 Issue / Project / OpenSpec、代码审查和验证；机器人只负责 PR 编排，不管理 Issue 或 Project 状态。
+
+### 1. 推送分支并验证机器人
+
+在提交已经完成、工作树符合项目流程后执行：
+
+```bash
+git status --short
+branch="$(git branch --show-current)"
+test "$branch" != main
+git push -u origin HEAD
+./scripts/pr-bot.sh verify
 ```
 
-执行：
+`verify` 检查私钥与配置文件权限、App slug、Owner、仓库、安装范围和最小权限。任何检查失败时停止；不要退回到 Owner 身份直接创建 PR。
+
+### 2. 准备完整 PR 正文
+
+将所有尖括号中的说明替换为真实内容后，写入仓库外的临时文件。机器人拒绝缺少章节、空章节或未解析模板注释的正文：
+
+```bash
+cat >/tmp/pr-body.md <<'EOF'
+## 关联
+- Issue：Closes #<issue-number>
+- OpenSpec：`openspec/changes/<change-id>/`
+
+## 背景与目标
+<为什么需要这项变更>
+
+## 修改内容
+- <实际修改项>
+
+## 验证
+- <实际运行的命令及结果>
+
+## 安全与风险
+- 安全影响：<影响或“无”>
+- 回滚方式：<明确方式>
+- 已知风险：<风险或“无”>
+
+## 契约、数据与配置
+- <OpenAPI、迁移和配置影响或“不适用”>
+
+## 界面证据
+<截图、录屏或“无 UI 变化”>
+
+## 未完成项
+<明确延期项或“无”>
+EOF
+```
+
+没有对应 Issue 或 OpenSpec 的小型非行为变更，正文仍须填写 `N/A` 及原因；其余章节仍必须非空。
+
+### 3. 创建或恢复机器人拥有的 PR
 
 ```bash
 ./scripts/pr-bot.sh create \
-  --head feat/example \
-  --title 'feat: example change' \
+  --head "$branch" \
+  --title '<type>: <short summary>' \
   --body-file /tmp/pr-body.md
 ```
 
-流程固定为：
+固定流程为：验证 App、安装、权限、仓库、远端分支、相对 `main` 的 diff 和正文；创建 Draft PR，或仅恢复同一机器人创建的同源 PR；请求并重新读取 `@cuihe500` Reviewer；确认成功后将 Draft 标记为 Ready。成功时命令输出 PR URL。
 
-1. 验证 App、安装、权限、仓库、分支、diff 和正文。
-2. 创建 Draft PR，或恢复同一机器人创建的现有 Draft。
-3. 请求 `@cuihe500` Reviewer。
-4. 从 GitHub 重新读取并确认 Reviewer。
-5. 确认后转为 Ready。
+机器人不会接管其他身份创建的开放 PR，也不会关闭 PR、删除分支或合并。若同一分支已有其他身份的开放 PR，命令会失败且不修改该 PR；由 Owner 处理冲突后再继续，不得绕过机器人另建 Owner 作者的 PR。
 
-任何步骤失败都返回非零退出码。已创建的 PR 保持 Draft；机器人不会关闭 PR 或删除分支。
+### 4. 确认状态、失败恢复和后续流程
 
-查询状态：
+使用创建命令输出的编号查询机器人拥有的 PR：
 
 ```bash
 ./scripts/pr-bot.sh status <pr-number>
 ```
 
-该命令拒绝查询并声明管理其他身份创建的 PR。
+输出必须显示 `state` 为 `open`、机器人作者、`@cuihe500` 位于 `requested_reviewers`，且 `draft` 为 `false` 才表示已 Ready。Reviewer 请求或 Ready 转换失败时，已创建 PR 保持 Draft；修正配置、正文或 GitHub 侧阻塞条件后，使用相同 `create` 命令重试，机器人会安全恢复自己的开放 PR。
 
-## Owner 审查隔离
+PR 创建并验证后，按 `AGENTS.md` 将关联 Issue 的 Project 项目更新为 `In Review`。机器人没有 Issues 或 Projects 权限；它不能代替这项流程同步、Owner 审查或合并门禁。
 
-机器人通过真实 PR 验收后，必须从 AI/pi 环境移除 Owner 的 `gh` 登录：
+## Owner 登录与机器人凭据共存
 
-```bash
-gh auth logout --hostname github.com --user cuihe500
-```
+App 验收后**不要求**执行 `gh auth logout`。Owner 的 `gh` 登录可继续用于 Owner 的人工操作；它不会成为机器人的 PR 身份，也不能替代 `@cuihe500` 的独立 Review。
 
-此操作只在所有验收检查完成后执行。Owner 后续在独立浏览器或人工终端中 Review 和 Merge。不要把 Owner Token 重新注入 AI 会话。
+机器人 App 私钥仍只保存在 `~/.config/cloudpilot-pve-pr-bot/private-key.pem`（`0600`），`config.json` 仍为 `0600`。每个机器人命令重新签发最长约 10 分钟的 App JWT，再交换约 1 小时有效的 Installation Token，并只在相应子进程环境中传递。不要打印、复制、提交或通过 `gh auth login` 保存这些凭据。
 
 ## 密钥轮换与撤销
 
