@@ -163,20 +163,25 @@ Closes #123
 OpenSpec: `openspec/changes/<change-id>/`
 ```
 
-推送并创建 PR：
+推送分支、准备完整 PR 正文并通过机器人创建 PR：
 
 ```bash
 git push -u origin HEAD
-gh pr create --base main --head "$(git branch --show-current)"
+./scripts/pr-bot.sh verify
+./scripts/pr-bot.sh create \
+  --head "$(git branch --show-current)" \
+  --title '<type>: <short-topic>' \
+  --body-file /tmp/pr-body.md
 ```
+
+PR 正文的必填章节、临时 Token 身份边界、状态查询和失败恢复见 [`docs/pr-bot.md`](pr-bot.md)。AI 不得使用 `gh pr create` 或等效的 Owner 身份 PR 修改命令；Owner `gh` 登录可以保留，但机器人必须以短期 Installation Token 创建和维护 AI PR。
 
 PR 正文必须包含背景、实际修改、验证证据、安全与风险、契约/迁移、界面证据和未完成项。有对应 Issue 时，创建成功后立即把其 Project 状态改为 `In Review`。
 
 - Reviewers 必须包含 `@cuihe500`，并由其完成 Owner 审查。
 - `.github/CODEOWNERS` 为所有路径指定 `@cuihe500`。
-- 评审修正在同一分支追加提交，重新验证并更新 PR 正文。
+- 评审修正在同一分支追加提交，重新验证并使用机器人更新 PR 正文。
 - `@cuihe500` 批准、CI 通过且评审对话全部解决前不得合并。
-
 ### 4.6 合并与结束需求
 
 PR 合并后，`Closes #<issue>` 自动关闭 Issue，Project 内置工作流将状态更新为 `Done`。必须实际确认 Issue 已关闭且状态为 `Done` 后才能报告需求结束。若自动更新失败，手工修正并记录原因。后续工作从更新后的 `main` 新建分支。
