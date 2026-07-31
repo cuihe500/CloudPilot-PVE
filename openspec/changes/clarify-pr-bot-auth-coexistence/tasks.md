@@ -9,7 +9,7 @@
 - [x] 2.1 Run `./scripts/pr-bot.sh verify` and `bash scripts/pr-bot_test.sh` to confirm the existing bot configuration and fail-closed command behavior remain intact.
 - [x] 2.2 Validate the OpenSpec change, Markdown links, shell syntax, and documentation diff; run `make check` as the repository-wide gate.
 - [x] 2.3 Perform a read-only review for secret exposure, direct Owner-authenticated PR commands, unintended historical-artifact edits, and consistency between the guide and the current `pr-bot` specification.
-- [ ] 2.4 Commit the scoped change, push its branch, use the PR Bot to create a PR with `Closes #14`, and move the Project item to `In Review` after verification passes.
+- [x] 2.4 Commit the scoped change, push its branch, use the PR Bot to create a PR with `Closes #14`, and move the Project item to `In Review` after verification passes.
 
 ## 中文翻译（非规范性）
 
